@@ -1,0 +1,9 @@
+<div>You are logged into the app.</div>
+<button id="title-btn">Play a game</button>
+<script>
+  $('#screen').append('<div>window.location.search = ' + window.location.search + '</div>');
+  $('#title-btn').click(function() {
+    app.transitionTo('home/game-0.html');
+  });
+</script>
+
