@@ -1,8 +1,12 @@
-var fs   = require('fs');
-var zlib = require('zlib');
-var url  = require('url');
+var fs     = require('fs');
+var zlib   = require('zlib');
+var url    = require('url');
+var crypto = require('crypto');
 
 // This code returns "not found" when '..' appears in the url.
+
+// For caching example:
+// http://blog.phyber.com/2012/03/30/supporting-cache-controls-in-node-js/
 
 var publicDir = 'public',
     files = [],
@@ -25,7 +29,7 @@ function insert(file) {
   if (files[i] !== null) console.log('SOMETHING IS WRONG');
   for (; i > 0; --i) {
     if (files[i - 1].name < file.name) break;
-    if (files[i - 1].name === file.name) throw new Error('req_file.insert: duplicate insertion');
+    if (files[i - 1].name === file.name) throw new Error('duplicate insertion');
     files[i] = files[i - 1];
   }
   files[i] = file;
@@ -53,6 +57,11 @@ exports.handle = function(req, res) {
     res.end('not found');
     return;
   }
+  if (req.headers['if-none-match'] === file.etag) {
+    res.statusCode = 304;
+    res.end();
+    return;
+  }
   if (file.gzip !== undefined && 
       req.headers['accept-encoding'] !== undefined && 
       req.headers['accept-encoding'].indexOf('gzip') !== -1) {
@@ -60,10 +69,11 @@ exports.handle = function(req, res) {
       'Content-Type': file.type,
       'Content-Length': file.gzip.length,
       'Pragma': 'public',
-      'Cache-Control': 'max-age=315360000', // 10 years in seconds
-      'Vary': 'Accept-Encoding',
+      'Cache-Control': 'public, max-age=315360000', // 10 years in seconds
+      'Vary': 'Accept-Encoding', 
       'Expires': new Date(Date.now() + 315360000000).toUTCString(),  // 10 years in milliseconds
-      'Content-Encoding': 'gzip',
+      'ETag': file.etag,
+      'Content-Encoding': 'gzip'
     });
     res.end(file.gzip);
   } else {
@@ -73,7 +83,8 @@ exports.handle = function(req, res) {
       'Pragma': 'public',
       'Cache-Control': 'max-age=315360000',
       'Vary': 'Accept-Encoding',
-      'Expires': new Date(Date.now() + 315360000000).toUTCString()
+      'Expires': new Date(Date.now() + 315360000000).toUTCString(),
+      'ETag': file.etag
     });
     res.end(file.data);
   }
@@ -169,10 +180,13 @@ exports.handle = function(req, res) {
     start();
     fs.readFile(filename, function (err, data) {
       if (err) throw err;
+      var shasum = crypto.createHash('sha1');
+      shasum.update(data, 'binary');
       var file = {
         name: filename.substr(publicDir.length),
         type: ext.type,
-        data: data
+        data: data,
+        etag: shasum.digest('hex')
       };
       insert(file);
       if (ext.gzip === false) return end();
