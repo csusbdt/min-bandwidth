@@ -1,17 +1,10 @@
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>App</title>
-  </head>
-  <body>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script>
-      window.app = {};
-      app.debug = DEBUG;
       $(function() {
-        $('html').load('home-VERSION.html' + (app.debug ? '?' + Math.random() : ''));
+        window.app = {};
+        $('html').load('home-0.html');
       });
     </script>
-  </body>
 </html>
 

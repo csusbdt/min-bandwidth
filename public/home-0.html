@@ -4,31 +4,24 @@
   </head>
   <body>
     <h1>App Home</h1>
-
-    <div id="screenContainer"><div>Loading...</div></div>
-
+    <div class="screen">Loading...</div>
     <script>
-      (function() {
-        var $screenContainer = $('#screenContainer'),
-            $screen = $screenContainer.children();
-        app.transitionTo = function(screenFile) {
-          var pendingReturns = 2,
-              $oldScreen = $screen;
-          function fadeInNewScreen() {
-            $oldScreen.remove();
-            $screen.fadeIn(300);
-          }
-          $screen = $('<div></div>').hide();
-          $screenContainer.append($screen);
-          $screen.load(screenFile + (app.debug ? '?' + Math.random() : ''), function() {
-            if (--pendingReturns === 0) fadeInNewScreen();
+      //window.app = {};
+      app.screen = function(htmlFrag) {
+// disable events
+        var n = 2;
+        var $div = $('<div></div>').hide();
+        function done() {
+          if (--n !== 0) return;
+          $('.screen').after($div).remove();
+          $div.fadeIn(1200, function() { 
+// endable events 
           });
-          $oldScreen.fadeOut(300, function() {
-            if (--pendingReturns === 0) fadeInNewScreen();
-          });
-        };
-      }());
-      app.transitionTo('home/login-0.html');
+        }
+        $div.load(htmlFrag, done);
+        $('.screen').fadeOut(1200, done);
+      };
+      app.screen('home/login-0.html');
     </script>
   </body>
 
