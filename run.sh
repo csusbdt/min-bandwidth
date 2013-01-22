@@ -1,5 +1,2 @@
-export APP_DEBUG=false
-export HOME_PAGE_VER=0
-export PORT=5000
-node main.js
+PORT=5000 MONGO_PORT=1234 MONGO_HOST=localhost node main.js
 

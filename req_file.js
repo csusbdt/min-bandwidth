@@ -5,9 +5,6 @@ var crypto = require('crypto');
 
 // This code returns "not found" when '..' appears in the url.
 
-// For caching example:
-// http://blog.phyber.com/2012/03/30/supporting-cache-controls-in-node-js/
-
 var publicDir = 'public',
     files = [],
     extmap = {
@@ -20,13 +17,12 @@ var publicDir = 'public',
       'mp3'  : { type: 'audio/mp3',              gzip: false }
     };
 
-// insert file into files array
-// throw exception if file already in array
+// Insert file into files array.
+// Throw exception if file already in array.
 function insert(file) {
-  // keep files ordered by name so we can use binary search
+  // Keep files ordered by name so we can use binary search when servicing requests.
   files.push(null);
   var i = files.length - 1;
-  if (files[i] !== null) console.log('SOMETHING IS WRONG');
   for (; i > 0; --i) {
     if (files[i - 1].name < file.name) break;
     if (files[i - 1].name === file.name) throw new Error('duplicate insertion');
@@ -35,9 +31,9 @@ function insert(file) {
   files[i] = file;
 }
 
-// return file or null
+// Return file or null.  Uses binary search.
 function find(filename) {
-  // locate file using binary search
+  // Locate file using binary search.
   var s = 0, 
       e = files.length - 1,
       m;
@@ -58,33 +54,37 @@ exports.handle = function(req, res) {
     return;
   }
   if (req.headers['if-none-match'] === file.etag) {
-    res.statusCode = 304;
+    res.writeHead(304, {
+      'Connection'       : 'keep-alive',
+      'Proxy-Connection' : 'keep-alive',
+      'Cache-Control'    : 'max-age=31536000',                               // 1 yr in secs
+      'Expires'          : new Date(Date.now() + 31536000000).toUTCString()  // 1 yr in msecs
+    });
     res.end();
-    return;
   }
   if (file.gzip !== undefined && 
       req.headers['accept-encoding'] !== undefined && 
       req.headers['accept-encoding'].indexOf('gzip') !== -1) {
     res.writeHead(200, {
-      'Content-Type': file.type,
-      'Content-Length': file.gzip.length,
-      'Pragma': 'public',
-      'Cache-Control': 'public, max-age=315360000', // 10 years in seconds
-      'Vary': 'Accept-Encoding', 
-      'Expires': new Date(Date.now() + 315360000000).toUTCString(),  // 10 years in milliseconds
-      'ETag': file.etag,
-      'Content-Encoding': 'gzip'
+      'Content-Type'     : file.type,
+      'Content-Length'   : file.gzip.length,
+      'Pragma'           : 'public',
+      'Cache-Control'    : 'public, max-age=31536000', 
+      'Vary'             : 'Accept-Encoding', 
+      'Expires'          : new Date(Date.now() + 31536000000).toUTCString(),
+      'ETag'             : file.etag,
+      'Content-Encoding' : 'gzip'
     });
     res.end(file.gzip);
   } else {
     res.writeHead(200, {
-      'Content-Type': file.type,
-      'Content-Length': file.data.length,
-      'Pragma': 'public',
-      'Cache-Control': 'max-age=315360000',
-      'Vary': 'Accept-Encoding',
-      'Expires': new Date(Date.now() + 315360000000).toUTCString(),
-      'ETag': file.etag
+      'Content-Type'   : file.type,
+      'Content-Length' : file.data.length,
+      'Pragma'         : 'public',
+      'Cache-Control'  : 'max-age=31536000',
+      'Vary'           : 'Accept-Encoding',
+      'Expires'        : new Date(Date.now() + 31536000000).toUTCString(),
+      'ETag'           : file.etag
     });
     res.end(file.data);
   }
@@ -95,7 +95,7 @@ exports.handle = function(req, res) {
 (function() {
 
   var pendingReturns = 0,
-      callback;     // to return back to main.js
+      callback;           // to return back to main.js
 
   function getExt(filename) {
     var i = filename.lastIndexOf('.');

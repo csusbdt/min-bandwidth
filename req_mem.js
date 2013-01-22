@@ -4,6 +4,7 @@ exports.handle = function(req, res) {
              '<p>rss = '       + Math.ceil(usage.rss       / 1024 / 1024) + ' MB</p>' +  
              '<p>heapTotal = ' + Math.ceil(usage.heapTotal / 1024 / 1024) + ' MB</p>' +
              '<p>heapUsed = '  + Math.ceil(usage.heapUsed  / 1024 / 1024) + ' MB</p>';
+      page = new Buffer(page, 'utf8');
   res.writeHead(200, {
     'Content-Type': 'text/html',
     'Content-Length': page.length,

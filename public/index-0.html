@@ -6,7 +6,6 @@
     <h1>App Home</h1>
     <div class="screen">Loading...</div>
     <script>
-      window.app = {};
       (function() {
         var n = 2, DEFAULT_SPEED = 300;
         app.screen = function(htmlFrag, screenSpeed) {
@@ -26,7 +25,7 @@
           $('.screen').fadeOut(screenSpeed, done);
         };
       }());
-      app.screen('home/login-0.html');
+      app.screen('index/login-0.html');
     </script>
   </body>
 

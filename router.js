@@ -1,16 +1,15 @@
 var http      = require('http');
 var url       = require('url');
 
-var req_home  = require('./req_home');
+var req_index = require('./req_index');
 var req_mem   = require('./req_mem');
 var req_file  = require('./req_file');
 
 function route(req, res) {
   var pathname = url.parse(req.url).pathname;
-  if      (pathname === '/')             req_home.redirectHome (req, res);
-  else if (pathname === '/home')         req_home.handle       (req, res);
-  else if (pathname === '/mem')          req_mem.handle        (req, res);
-  else                                   req_file.handle       (req, res);
+  if      (pathname === '/')      req_index.handle (req, res);
+  else if (pathname === '/mem')   req_mem.handle   (req, res);
+  else                            req_file.handle  (req, res);
 }
 
 function requestHandler(req, res) {

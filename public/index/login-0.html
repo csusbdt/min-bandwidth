@@ -1,0 +1,11 @@
+<div>Date: <span id="appDate"></span></div>
+<div>Mongo port: <span id="mongoPort"></span></div>
+<button id="login-btn">Login</button>
+<script>
+  $('#appDate').html(app.model.date);
+  $('#mongoPort').html(app.config.mongoPort);
+  $('#login-btn').click(function() {
+    app.screen('index/title-0.html');
+  });
+</script>
+
