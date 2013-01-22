@@ -95,7 +95,7 @@ exports.handle = function(req, res) {
 (function() {
 
   var pendingReturns = 0,
-      callback;
+      callback;     // to return back to main.js
 
   function getExt(filename) {
     var i = filename.lastIndexOf('.');
