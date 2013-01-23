@@ -1,31 +1,31 @@
-  <head>
-    <meta charset="utf-8">
-    <title>App Home</title>
-  </head>
-  <body>
-    <h1>App Home</h1>
-    <div class="screen">Loading...</div>
-    <script>
-      (function() {
-        var n = 2, DEFAULT_SPEED = 300;
-        app.screen = function(htmlFrag, screenSpeed) {
-          if (n !== 2) return;  // don't allow more than one transition
-          if (typeof screenSpeed === 'undefined') screenSpeed = DEFAULT_SPEED;
-          var $div = $('<div></div>').hide(); 
-          $('.screen').after($div);
-          function done() {
-            if (--n !== 0) return;
-            $('.screen').remove();
-            $div.addClass('screen');
-            $div.fadeIn(screenSpeed, function() { 
-              n = 2;  // reset for next transition
-            });
-          }
-          $div.load(htmlFrag, done);
-          $('.screen').fadeOut(screenSpeed, done);
-        };
-      }());
-      app.screen('index/login-0.html');
-    </script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <title>App Home</title>
+</head>
+<body>
+  <h1>App Home</h1>
+  <div class="screen">Loading...</div>
+  <script>
+    (function() {
+      var n = 2, DEFAULT_SPEED = 300;
+      app.screen = function(htmlFrag, screenSpeed) {
+        if (n !== 2) return;  // don't allow more than one transition
+        if (typeof screenSpeed === 'undefined') screenSpeed = DEFAULT_SPEED;
+        var $div = $('<div></div>').hide(); 
+        $('.screen').after($div);
+        function done() {
+          if (--n !== 0) return;
+          $('.screen').remove();
+          $div.addClass('screen');
+          $div.fadeIn(screenSpeed, function() { 
+            n = 2;  // reset for next transition
+          });
+        }
+        $div.load(htmlFrag, done);
+        $('.screen').fadeOut(screenSpeed, done);
+      };
+    }());
+    app.screen('index/login-0.html');
+  </script>
+</body>
 
