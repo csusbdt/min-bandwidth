@@ -1,11 +1,61 @@
+<div id="fb-root"></div>
 <div>Date: <span id="appDate"></span></div>
 <div>Mongo port: <span id="mongoPort"></span></div>
-<button id="login-btn">Login</button>
+<button id="login-btn">Facebook Login</button>
 <script>
-  $('#appDate').html(app.model.date);
-  $('#mongoPort').html(app.config.mongoPort);
+  $('#appDate').html(app.m.date);
+  $('#mongoPort').html(app.cfg.mongoPort);
   $('#login-btn').click(function() {
-    app.screen('index/title-0.html');
   });
+
+  (function() {
+    function fbLogin(cb) {
+      FB.login(function(response) {
+        if (response.authResponse) {
+          console.log('?uid=' + response.authResponse.userID);
+          console.log('&token=' + response.authResponse.accessToken);
+          cb();
+        } else {
+          cb('Login failed.');
+        }
+      });
+    };
+
+    function fbInit(facebookAppId) {
+      FB.init({
+        appId      : app.cfg.fbAppId,
+        channelUrl : '://' + window.location.host + '/channel.html',
+        status     : false,  // check the login status upon init?
+        cookie     : false,  // set sessions cookies?
+        xfbml      : false
+      });
+      FB.Canvas.setAutoGrow();
+      FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+          console.log('?uid=' + response.authResponse.userID);
+          console.log('&token=' + response.authResponse.accessToken);
+          //app.screen('index/title-0.html');
+          alert('app.v.transitionTo title screen');
+        } else {
+          console.log('stay in login screen');
+        }
+      });
+    };
+
+    var pendingReturns = 1;
+
+    window.fbAsyncInit = function() {
+      if (--pendingReturns === 0) {
+        fbInit();
+      }
+    };
+    var ref = document.getElementsByTagName('script')[0],
+        fbJs = document.createElement('script');
+    fbJs.id = 'facebook-jssdk'; 
+    fbJs.async = true;
+    fbJs.src = "//connect.facebook.net/en_US/all.js";
+    ref.parentNode.insertBefore(fbJs, ref);
+
+  }());
 </script>
 
